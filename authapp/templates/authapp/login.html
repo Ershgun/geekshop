@@ -3,6 +3,11 @@
 
 
 {% block content %}
+
+        {% if 'register' in request.META.HTTP_REFERER %}
+            <span>Сообщение с активацией отправлено на почту!</span>
+        {% endif %}
+
     <form class="form-horizontal" action="{% url 'auth:login' %}" method="post">
         {% csrf_token %}
         {% if next %}
