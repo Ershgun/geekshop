@@ -4,9 +4,9 @@
 
 {% block content %}
 
-        {% if 'register' in request.META.HTTP_REFERER %}
-            <span>Сообщение с активацией отправлено на почту!</span>
-        {% endif %}
+    {% if 'register' in request.META.HTTP_REFERER %}
+        <span>Сообщение с активацией отправлено на почту!</span>
+    {% endif %}
 
     <form class="form-horizontal" action="{% url 'auth:login' %}" method="post">
         {% csrf_token %}
@@ -20,6 +20,12 @@
     <button class="btn btn-round form-control">
         <a href="{% url 'auth:register' %}" class="">
             зарегистрироваться
+        </a>
+    </button>
+
+    <button class="btn btn-round form-control">
+        <a href="{% url 'social:begin' 'vk-oauth2' %}?next=/" class="">
+            Войти через VK
         </a>
     </button>
 
