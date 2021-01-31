@@ -55,7 +55,7 @@ window.onload = function () {
         orderSummeryUpdate(price_arr[orderitem_num], delta_quantity);
     });
 
-    $('.order_form').on('change', function(){
+    $('.order_form').on('change','select', function(){
         var target = event.target;
         orderitem_num = parseInt(target.name.replace('orderitems-', '').replace('-product', ''));
         var orderitem_product_pk = target.options[target.selectedIndex].value;
