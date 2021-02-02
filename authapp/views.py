@@ -1,6 +1,8 @@
 from django.conf import settings
 from django.core.mail import send_mail
 from django.shortcuts import render, HttpResponseRedirect
+from django.views.decorators.csrf import csrf_exempt
+
 from authapp.forms import ShopUserLoginForm, ShopUserRegisterForm, ShopUserProfileEditForm
 from django.contrib import auth
 from django.urls import reverse
@@ -31,6 +33,8 @@ def verify(request, email, activation_key):
         return HttpResponseRedirect(reverse('main'))
 
 
+
+#@csrf_exempt
 def login(request):
     title = 'вход'
 
