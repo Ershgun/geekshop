@@ -22,14 +22,14 @@ def get_links_menu():
 
 def get_category(pk):
     if settings.LOW_CACHE:
-        key = f'category_ {pk} '
+        key = f'category_{pk}'
         category = cache.get(key)
         if category is None:
-            category = get_object_or_404(ProductCategory, pk=pk)
+            category = ProductCategory.objects.get(pk=pk)
             cache.set(key, category)
         return category
     else:
-        return get_object_or_404(ProductCategory, pk=pk)
+        return ProductCategory.objects.get(pk=pk)
 
 
 JSON_PATH = 'mainapp/json'
