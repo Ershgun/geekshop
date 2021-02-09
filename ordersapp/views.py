@@ -1,4 +1,7 @@
+from _curses import raw
+
 from django.db import transaction
+from django.db.models import F
 from django.db.models.signals import pre_save, pre_delete
 from django.dispatch import receiver
 from django.forms import inlineformset_factory
@@ -129,18 +132,21 @@ def order_forming_complete(request, pk):
 @receiver(pre_save, sender=Basket)
 @receiver(pre_save, sender=OrderItem)
 def product_quantity_update_save(sender, update_fields, instance, **kwargs):
-    if update_fields is 'quantity' or 'product':
+    if update_fields == 'quantity' or 'product' and not raw:
         if instance.pk:
-            instance.product.quantity -= instance.quantity - sender.get_item(instance.pk).quantity
+            # instance.product.quantity -= instance.quantity - sender.get_item(instance.pk).quantity
+            instance.product.quantity = F('quantity') - (instance.quantity - sender.get_item(instance.pk).quantity)
         else:
-            instance.product.quantity -= instance.quantity
+            # instance.product.quantity -= instance.quantity
+            instance.product.quantity = F('quantity') -  instance.quantity
         instance.product.save()
 
 
 @receiver(pre_delete, sender=Basket)
 @receiver(pre_delete, sender=OrderItem)
 def product_quantity_update_delete(sender, instance, **kwargs):
-    instance.product.quantity += instance.quantity
+    # instance.product.quantity += instance.quantity
+    instance.product.quantity = F('quantity') + instance.quantity
     instance.product.save()
 
 

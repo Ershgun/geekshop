@@ -1,4 +1,6 @@
 import datetime, random, os, json
+
+from django.db.models import Q
 from django.shortcuts import render, get_object_or_404
 from mainapp.models import ProductCategory, Product
 from basketapp.models import Basket
@@ -76,6 +78,9 @@ def products(request, pk=None, page=1):
                 'name': 'все'
             }
             products = Product.objects.filter(is_active=True, category__is_active=True).order_by('price')
+            # prod = ProductCategory.objects.all().exclude(pk=1).exclude(pk=2).values_list('pk', flat=True)
+            # products = ProductCategory.objects.exclude(pk__in=prod)
+            # products = ProductCategory.objects.filter(Q(pk=1) | Q(pk=2))
         else:
             category = get_category(pk)
             products = Product.objects.filter(category__pk=pk, is_active=True, category__is_active=True).order_by(
