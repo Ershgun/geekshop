@@ -1,3 +1,5 @@
+from django.db import connection
+from django.db.models import F
 from django.shortcuts import render, HttpResponseRedirect, get_object_or_404
 from basketapp.models import Basket
 from mainapp.models import Product
@@ -23,20 +25,43 @@ def basket(request):
 
  
 @login_required
+
 def basket_add(request, pk):
     if 'login' in request.META.get('HTTP_REFERER'):
         return HttpResponseRedirect(reverse('products:product', args=[pk]))
-    
+
     product = get_object_or_404(Product, pk=pk)
-    basket = Basket.objects.filter(user=request.user, product=product).first()
+    old_basket_item = Basket.get_product(user=request.user, product=product)
 
-    if not basket:
-        basket = Basket(user=request.user, product=product)
+    if old_basket_item:
+        # old_basket_item[0].quantity += 1
+        old_basket_item[0].quantity = F('quantity') + 1
+        old_basket_item[0].save()
 
-    basket.quantity += 1
-    basket.save()
-    
+        update_queries = list(filter(lambda x: 'UPDATE' in x['sql'], connection.queries))
+        print(f'query basket_add: {update_queries}')
+
+    else:
+        new_basket_item = Basket(user=request.user, product=product)
+        new_basket_item.quantity += 1
+        new_basket_item.save()
+
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+# def basket_add(request, pk):
+#     if 'login' in request.META.get('HTTP_REFERER'):
+#         return HttpResponseRedirect(reverse('products:product', args=[pk]))
+#
+#     product = get_object_or_404(Product, pk=pk)
+#     basket = Basket.objects.filter(user=request.user, product=product).first()
+#
+#     if not basket:
+#         basket = Basket(user=request.user, product=product)
+#
+#     basket.quantity += 1
+#     basket.save()
+#
+#     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
     
 
 @login_required
@@ -60,7 +85,7 @@ def basket_edit(request, pk, quantity):
             new_basket_item.delete()
             
         basket_items = Basket.objects.filter(user=request.user).order_by('product__category')
-        
+
         content = {
             'basket_items': basket_items,
         }
